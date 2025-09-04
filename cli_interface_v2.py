@@ -6,7 +6,7 @@ from login_manager_v2 import LoginManagerV2
 from profile_manager import ProfileManager
 from automation_executor_v2 import AutomationExecutorV2
 from proxy_tester import ProxyTester
-from cli_automation import AutomationCLI
+from cli_automation_v2 import AutomationCLIV2
 
 
 class CLIInterfaceV2:
@@ -18,7 +18,7 @@ class CLIInterfaceV2:
         self.profile_manager = ProfileManager()
         self.automation_executor = AutomationExecutorV2()
         self.proxy_tester = ProxyTester()
-        self.automation_cli = AutomationCLI()
+        self.automation_cli = AutomationCLIV2()
 
     def display_accounts_with_status(self):
         """アカウント一覧表示（プロファイル状態付き）"""
