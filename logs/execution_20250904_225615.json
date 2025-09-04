@@ -1,0 +1,14 @@
+[
+  {
+    "account_id": 1,
+    "email": "exdel81",
+    "url": "https://x.com/adotarou_/status/1806524402617757833",
+    "success": false,
+    "actions_performed": [],
+    "errors": [
+      "いいね失敗",
+      "ブックマーク失敗"
+    ],
+    "timestamp": "2025-09-04T22:55:21.381731"
+  }
+]

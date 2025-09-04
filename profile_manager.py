@@ -37,10 +37,18 @@ class ProfileManager:
         with open(self.profile_index_file, "w", encoding="utf-8") as f:
             json.dump(self.profile_index, f, ensure_ascii=False, indent=2)
 
+    # profile_manager.pyの該当部分を修正
     def get_profile_path(self, account_email: str) -> str:
-        """アカウント用プロファイルパス取得"""
+        """アカウント用プロファイルパス取得（絶対パス版）"""
+        import os
+
         safe_email = account_email.replace("@", "_at_").replace(".", "_")
-        profile_path = os.path.join(self.base_profile_dir, f"profile_{safe_email}")
+
+        # 絶対パスを確実に取得
+        current_dir = os.getcwd()
+        profile_path = os.path.join(
+            current_dir, self.base_profile_dir, f"profile_{safe_email}"
+        )
         return os.path.abspath(profile_path)
 
     def get_temp_profile_path(self, account_email: str) -> str:
@@ -78,6 +86,9 @@ class ProfileManager:
                 print(f"  → 専用プロファイル使用: {os.path.basename(profile_path)}")
 
             chrome_options.add_argument(f"--user-data-dir={profile_path}")
+            chrome_options.add_argument(
+                "--profile-directory=Default"
+            )  # この行があるか確認
 
             # 基本設定
             chrome_options.add_argument("--no-sandbox")
@@ -87,9 +98,20 @@ class ProfileManager:
             chrome_options.add_argument("--disable-notifications")
             chrome_options.add_argument("--disable-popup-blocking")
 
-            # プロキシ設定
+            # プロキシ設定（重要：この部分を確認）
             if proxy_url:
-                chrome_options.add_argument(f"--proxy-server={proxy_url}")
+                # proxy_urlから認証情報を分離
+                # http://username:password@host:port の形式から host:port を抽出
+                if "@" in proxy_url:
+                    # 認証情報を除去してホスト:ポートのみを使用
+                    proxy_parts = proxy_url.split("@")
+                    proxy_server = proxy_parts[1]  # host:port部分
+                    proxy_server = f"http://{proxy_server}"
+                else:
+                    proxy_server = proxy_url
+
+                chrome_options.add_argument(f"--proxy-server={proxy_server}")
+                print(f"  → プロキシ設定: {proxy_server}")
 
             # ドライバー作成
             driver = uc.Chrome(options=chrome_options, version_main=139)

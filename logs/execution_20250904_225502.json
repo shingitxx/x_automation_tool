@@ -1,0 +1,26 @@
+[
+  {
+    "account_id": 1,
+    "email": "exdel81",
+    "url": "https://x.com/elonmusk/status/1234567890",
+    "success": false,
+    "actions_performed": [],
+    "errors": [
+      "いいね失敗",
+      "ブックマーク失敗"
+    ],
+    "timestamp": "2025-09-04T22:53:10.262195"
+  },
+  {
+    "account_id": 2,
+    "email": "ehjonesy",
+    "url": "https://x.com/elonmusk/status/1234567890",
+    "success": false,
+    "actions_performed": [],
+    "errors": [
+      "いいね失敗",
+      "ブックマーク失敗"
+    ],
+    "timestamp": "2025-09-04T22:54:08.400656"
+  }
+]

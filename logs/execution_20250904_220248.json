@@ -1,0 +1,26 @@
+[
+  {
+    "account_id": 1,
+    "email": "exdel81",
+    "url": "https://x.com/adotarou_/status/1808035517654786262",
+    "success": true,
+    "actions_performed": [
+      "bookmark",
+      "retweet",
+      "reply"
+    ],
+    "errors": [],
+    "timestamp": "2025-09-04T22:00:08.257578"
+  },
+  {
+    "account_id": 3,
+    "email": "VaranyCTR",
+    "url": "https://x.com/adotarou_/status/1808035517654786262",
+    "success": false,
+    "actions_performed": [],
+    "errors": [
+      "Cookie読み込み失敗"
+    ],
+    "timestamp": "2025-09-04T22:02:36.233018"
+  }
+]
