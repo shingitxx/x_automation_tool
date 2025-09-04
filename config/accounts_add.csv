@@ -1,0 +1,4 @@
+アカウントID,パスワード,プロキシホスト,プロキシポート,プロキシユーザー,プロキシパスワード
+account2@example.com,password2,iproyalfast.hellworld.io,12322,your_proxy_user,your_proxy_pass
+account3@example.com,password3,iproyalfast.hellworld.io,12323,your_proxy_user,your_proxy_pass
+account4@example.com,password4,iproyalfast.hellworld.io,12324,your_proxy_user,your_proxy_pass

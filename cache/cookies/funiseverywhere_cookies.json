@@ -1,0 +1,85 @@
+{
+  "cookies": [
+    {
+      "domain": ".x.com",
+      "expiry": 1791466579,
+      "httpOnly": false,
+      "name": "__cuid",
+      "path": "/",
+      "sameSite": "Lax",
+      "secure": false,
+      "value": "1e2ebcbfbee342fe9793da226f190e54"
+    },
+    {
+      "domain": ".x.com",
+      "expiry": 1756992982,
+      "httpOnly": true,
+      "name": "att",
+      "path": "/",
+      "sameSite": "None",
+      "secure": true,
+      "value": "1-EOsQJRqqdbmZPHPwrsKWlwxoTSE5o0ru4nB9h4xy"
+    },
+    {
+      "domain": ".x.com",
+      "expiry": 1756915576,
+      "httpOnly": false,
+      "name": "gt",
+      "path": "/",
+      "sameSite": "Lax",
+      "secure": true,
+      "value": "1963234593248846058"
+    },
+    {
+      "domain": ".x.com",
+      "expiry": 1791466576,
+      "httpOnly": false,
+      "name": "guest_id_marketing",
+      "path": "/",
+      "sameSite": "None",
+      "secure": true,
+      "value": "v1%3A175690657680331859"
+    },
+    {
+      "domain": ".x.com",
+      "expiry": 1756908376,
+      "httpOnly": true,
+      "name": "__cf_bm",
+      "path": "/",
+      "sameSite": "None",
+      "secure": true,
+      "value": "UwtBs_sQJMdqrD0HfsUzmmFIFLXq3VdSSkTq4joVtZM-1756906576-1.0.1.1-ONSC5Bj5akPo9fEPAMXnrTA7fDgeTQlfdueVlg4WOBkuSIGGJcE1gwE_ja_ahLBRL0lOX7Xt0RzAHS7Swqq0MLqX4QPJ0r2uDGMOX7AOuXI"
+    },
+    {
+      "domain": ".x.com",
+      "expiry": 1791466576,
+      "httpOnly": false,
+      "name": "guest_id",
+      "path": "/",
+      "sameSite": "None",
+      "secure": true,
+      "value": "v1%3A175690657680331859"
+    },
+    {
+      "domain": ".x.com",
+      "expiry": 1791466576,
+      "httpOnly": false,
+      "name": "guest_id_ads",
+      "path": "/",
+      "sameSite": "None",
+      "secure": true,
+      "value": "v1%3A175690657680331859"
+    },
+    {
+      "domain": ".x.com",
+      "expiry": 1791466576,
+      "httpOnly": false,
+      "name": "personalization_id",
+      "path": "/",
+      "sameSite": "None",
+      "secure": true,
+      "value": "\"v1_Tr+AzQ2JzS2c8y3qaf/PKg==\""
+    }
+  ],
+  "saved_at": "2025-09-03T22:37:01.783048"
+}

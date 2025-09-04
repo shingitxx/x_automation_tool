@@ -1,0 +1,27 @@
+[
+  {
+    "account_id": 2,
+    "email": "ehjonesy",
+    "url": "https://x.com/adotarou_/status/1816001559932854273",
+    "success": false,
+    "actions_performed": [],
+    "errors": [
+      "ドライバー起動失敗"
+    ],
+    "timestamp": "2025-09-04T18:39:43.657316"
+  },
+  {
+    "account_id": 1,
+    "email": "exdel81",
+    "url": "https://x.com/adotarou_/status/1816001559932854273",
+    "success": true,
+    "actions_performed": [
+      "like",
+      "bookmark",
+      "retweet",
+      "reply"
+    ],
+    "errors": [],
+    "timestamp": "2025-09-04T18:39:43.651800"
+  }
+]

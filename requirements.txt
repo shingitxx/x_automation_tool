@@ -1,0 +1,17 @@
+# X自動化ツール 依存ライブラリ
+
+# 暗号化
+cryptography==41.0.7
+
+# CSV処理とデータ操作
+pandas==2.1.4
+
+# Webスクレイピング（今後の実装用）
+selenium==4.16.0
+undetected-chromedriver==3.5.4
+
+# HTTP通信
+requests==2.31.0
+
+# ログ管理（今後の実装用）
+loguru==0.7.2
