@@ -1,0 +1,24 @@
+[
+  {
+    "account_id": 2,
+    "email": "ehjonesy",
+    "url": "https://x.com/ura_matsu1/status/1963894632355623285",
+    "success": false,
+    "actions_performed": [],
+    "errors": [
+      "ドライバー起動失敗"
+    ],
+    "timestamp": "2025-09-05T22:05:02.108166"
+  },
+  {
+    "account_id": 1,
+    "email": "exdel81",
+    "url": "https://x.com/ura_matsu1/status/1963894632355623285",
+    "success": false,
+    "actions_performed": [],
+    "errors": [
+      "ドライバー起動失敗"
+    ],
+    "timestamp": "2025-09-05T22:05:02.106164"
+  }
+]

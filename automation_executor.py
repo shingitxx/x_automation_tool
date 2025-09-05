@@ -450,3 +450,104 @@ class AutomationExecutor:
             json.dump(results, f, ensure_ascii=False, indent=2)
 
         print(f"\n実行ログ保存: {log_file}")
+
+    def execute_parallel(
+        self,
+        account_ids: List[int],
+        target_url: str,
+        actions: Dict[str, bool],
+        wait_range: Tuple[int, int],
+        max_workers: int = 3,  # max_concurrent から max_workers に変更
+    ) -> List[Dict]:
+        """並列実行（複数アカウント同時処理）"""
+        results = []
+        total_accounts = len(account_ids)
+
+        print(f"\n{'='*60}")
+        print(f" 自動操作実行（並列処理版）")
+        print(f"{'='*60}")
+        print(f"対象URL: {target_url}")
+        print(f"実行操作: {', '.join([k for k, v in actions.items() if v])}")
+        print(f"アカウント数: {total_accounts}")
+        print(f"同時実行数: {max_workers}")  # max_concurrent から max_workers に変更
+        print(f"待機時間: {wait_range[0]}-{wait_range[1]}秒")
+        print(f"{'='*60}")
+
+        # プロファイル存在チェック
+        valid_accounts = []
+        for account_id in account_ids:
+            account = self.account_manager.get_account_by_id(account_id)
+            if not account:
+                continue
+            if not self.profile_manager.profile_exists(account["email"]):
+                print(f"⚠ [{account_id}] {account['email']}: プロファイルがありません")
+                continue
+            valid_accounts.append(account_id)
+
+        if not valid_accounts:
+            print("実行可能なアカウントがありません")
+            return results
+
+        # バッチ処理
+        for i in range(
+            0, len(valid_accounts), max_workers
+        ):  # max_concurrent から max_workers に変更
+            batch = valid_accounts[
+                i : i + max_workers
+            ]  # max_concurrent から max_workers に変更
+            batch_num = (i // max_workers) + 1  # max_concurrent から max_workers に変更
+            total_batches = (
+                len(valid_accounts) + max_workers - 1
+            ) // max_workers  # max_concurrent から max_workers に変更
+
+            print(f"\nバッチ {batch_num}/{total_batches} 処理開始")
+            print(f"アカウント: {batch}")
+
+            # スレッドプールで並列実行
+            threads = []
+            batch_results = []
+            result_queue = Queue()
+
+            for account_id in batch:
+                thread = threading.Thread(
+                    target=self._thread_worker,
+                    args=(account_id, target_url, actions, wait_range, result_queue),
+                )
+                threads.append(thread)
+                thread.start()
+
+            # 全スレッド完了待機
+            for thread in threads:
+                thread.join()
+
+            # 結果収集
+            while not result_queue.empty():
+                batch_results.append(result_queue.get())
+
+            results.extend(batch_results)
+
+            # 次のバッチまでの間隔
+            if i + max_workers < len(
+                valid_accounts
+            ):  # max_concurrent から max_workers に変更
+                interval = random.uniform(5, 10)
+                print(f"\n次のバッチまで {interval:.1f} 秒待機...")
+                time.sleep(interval)
+
+        self.print_summary(results)
+        self.save_results(results)
+        return results
+
+    def _thread_worker(
+        self,
+        account_id: int,
+        target_url: str,
+        actions: Dict[str, bool],
+        wait_range: Tuple[int, int],
+        result_queue: Queue,
+    ):
+        """スレッドワーカー（並列実行用）"""
+        result = self.process_single_account(
+            account_id, target_url, actions, wait_range
+        )
+        result_queue.put(result)

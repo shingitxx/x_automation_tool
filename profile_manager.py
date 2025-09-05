@@ -7,6 +7,10 @@ import undetected_chromedriver as uc
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
+import tempfile
+import uuid
+import tempfile
+import shutil
 
 
 class ProfileManager:
@@ -37,14 +41,9 @@ class ProfileManager:
         with open(self.profile_index_file, "w", encoding="utf-8") as f:
             json.dump(self.profile_index, f, ensure_ascii=False, indent=2)
 
-    # profile_manager.pyの該当部分を修正
     def get_profile_path(self, account_email: str) -> str:
         """アカウント用プロファイルパス取得（絶対パス版）"""
-        import os
-
         safe_email = account_email.replace("@", "_at_").replace(".", "_")
-
-        # 絶対パスを確実に取得
         current_dir = os.getcwd()
         profile_path = os.path.join(
             current_dir, self.base_profile_dir, f"profile_{safe_email}"
@@ -77,7 +76,7 @@ class ProfileManager:
         try:
             chrome_options = uc.ChromeOptions()
 
-            # プロファイル設定
+            # プロファイル設定（元の形に戻す）
             if use_temp:
                 profile_path = self.get_temp_profile_path(account_email)
                 print(f"  → 一時プロファイル使用: {os.path.basename(profile_path)}")
@@ -86,11 +85,9 @@ class ProfileManager:
                 print(f"  → 専用プロファイル使用: {os.path.basename(profile_path)}")
 
             chrome_options.add_argument(f"--user-data-dir={profile_path}")
-            chrome_options.add_argument(
-                "--profile-directory=Default"
-            )  # この行があるか確認
+            chrome_options.add_argument("--profile-directory=Default")
 
-            # 基本設定
+            # 基本設定（元の設定に戻す）
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--disable-blink-features=AutomationControlled")
@@ -98,25 +95,22 @@ class ProfileManager:
             chrome_options.add_argument("--disable-notifications")
             chrome_options.add_argument("--disable-popup-blocking")
 
-            # プロキシ設定（重要：この部分を確認）
+            # プロキシ設定
             if proxy_url:
-                # proxy_urlから認証情報を分離
-                # http://username:password@host:port の形式から host:port を抽出
                 if "@" in proxy_url:
-                    # 認証情報を除去してホスト:ポートのみを使用
                     proxy_parts = proxy_url.split("@")
-                    proxy_server = proxy_parts[1]  # host:port部分
+                    proxy_server = proxy_parts[1]
                     proxy_server = f"http://{proxy_server}"
                 else:
                     proxy_server = proxy_url
-
                 chrome_options.add_argument(f"--proxy-server={proxy_server}")
                 print(f"  → プロキシ設定: {proxy_server}")
 
-            # ドライバー作成
+            # ドライバー作成（元の設定に戻す）
             driver = uc.Chrome(options=chrome_options, version_main=139)
             driver.implicitly_wait(10)
 
+            print(f"  ✓ ドライバー起動成功")
             return driver
 
         except Exception as e:
@@ -142,14 +136,11 @@ class ProfileManager:
         try:
             permanent_path = self.get_profile_path(account_email)
 
-            # 既存の永続プロファイルがある場合は削除
             if os.path.exists(permanent_path):
                 shutil.rmtree(permanent_path)
 
-            # 一時プロファイルを永続プロファイルに移動
             shutil.move(temp_profile_path, permanent_path)
 
-            # インデックス更新
             self.save_profile_info(
                 account_email,
                 {
@@ -194,11 +185,9 @@ class ProfileManager:
         try:
             profile_path = self.get_profile_path(account_email)
 
-            # プロファイルディレクトリ削除
             if os.path.exists(profile_path):
                 shutil.rmtree(profile_path)
 
-            # インデックスから削除
             if account_email in self.profile_index.get("profiles", {}):
                 del self.profile_index["profiles"][account_email]
                 self._save_profile_index()
@@ -224,7 +213,6 @@ class ProfileManager:
             driver.get("https://x.com/home")
             time.sleep(3)
 
-            # ログイン状態確認
             if "home" in driver.current_url.lower():
                 return True
             return False

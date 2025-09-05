@@ -1,0 +1,13 @@
+[
+  {
+    "account_id": 1,
+    "email": "exdel81",
+    "url": "https://x.com/Iron__Fortress/status/1963883370397532479",
+    "success": false,
+    "actions_performed": [],
+    "errors": [
+      "ドライバー起動失敗"
+    ],
+    "timestamp": "2025-09-05T20:30:30.245425"
+  }
+]
