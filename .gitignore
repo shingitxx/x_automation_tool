@@ -5,3 +5,6 @@ logs/
 data/
 *.pyc
 __pycache__/
+*_backup*/
+*.lock
+proxy_auth_plugin*.zip
