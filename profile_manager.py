@@ -46,11 +46,12 @@ class ProfileManager:
             json.dump(self.profile_index, f, ensure_ascii=False, indent=2)
 
     def _get_free_port(self) -> int:
-        """未使用のポート番号を取得"""
+        """未使用のポート番号を取得（範囲拡大版）"""
         with self.port_lock:
-            port = random.randint(9500, 9999)
+            # ポート範囲を拡大
+            port = random.randint(9000, 65000)
             while port in self.used_ports:
-                port = random.randint(9500, 9999)
+                port = random.randint(9000, 65000)
             self.used_ports.add(port)
             return port
 
@@ -92,86 +93,214 @@ class ProfileManager:
     ) -> Optional[webdriver.Chrome]:
         """プロファイル付きドライバー作成（修正版）"""
         port = None
-        try:
-            chrome_options = uc.ChromeOptions()
+        max_retries = 3
+        proxy_extension = None
 
-            # プロファイル設定
-            if use_temp:
-                profile_path = self.get_temp_profile_path(account_email)
-                print(f"  → 一時プロファイル使用: {os.path.basename(profile_path)}")
-            else:
-                profile_path = self.get_profile_path(account_email)
-                print(f"  → 専用プロファイル使用: {os.path.basename(profile_path)}")
-
-            chrome_options.add_argument(f"--user-data-dir={profile_path}")
-            chrome_options.add_argument("--profile-directory=Default")
-
-            # 基本設定
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-            chrome_options.add_argument("--disable-gpu")
-            chrome_options.add_argument("--disable-notifications")
-            chrome_options.add_argument("--disable-popup-blocking")
-
-            # 動的ポート割り当て
-            port = self._get_free_port()
-            chrome_options.add_argument(f"--remote-debugging-port={port}")
-
-            # プロキシ設定
-            if proxy_url:
-                if "@" in proxy_url:
-                    proxy_parts = proxy_url.split("@")
-                    proxy_server = proxy_parts[1]
-                    proxy_server = f"http://{proxy_server}"
-                else:
-                    proxy_server = proxy_url
-                chrome_options.add_argument(f"--proxy-server={proxy_server}")
-                print(f"  → プロキシ設定: {proxy_server}")
-
-            # 一時ディレクトリを個別に設定
-            temp_dir = tempfile.mkdtemp(prefix=f"uc_{account_email.replace('@', '_')}_")
-
-            # 環境変数で一時ディレクトリを指定
-            old_temp = os.environ.get("TEMP")
-            old_tmp = os.environ.get("TMP")
-            os.environ["TEMP"] = temp_dir
-            os.environ["TMP"] = temp_dir
-
+        for attempt in range(max_retries):
             try:
-                # ドライバー作成
-                driver = uc.Chrome(
-                    options=chrome_options,
-                    version_main=139,
-                    driver_executable_path=None,
-                    use_subprocess=True,
+                chrome_options = uc.ChromeOptions()
+
+                # プロファイル設定
+                if use_temp:
+                    profile_path = self.get_temp_profile_path(account_email)
+                    print(f"  → 一時プロファイル使用: {os.path.basename(profile_path)}")
+                else:
+                    profile_path = self.get_profile_path(account_email)
+                    print(f"  → 専用プロファイル使用: {os.path.basename(profile_path)}")
+
+                # プロファイルのロックファイルをクリーンアップ
+                profile_lock_files = [
+                    os.path.join(profile_path, "SingletonLock"),
+                    os.path.join(profile_path, "SingletonSocket"),
+                    os.path.join(profile_path, "SingletonCookie"),
+                    os.path.join(profile_path, "DevToolsActivePort"),
+                    os.path.join(profile_path, "Default", "DevToolsActivePort"),
+                ]
+                for lock_file in profile_lock_files:
+                    if os.path.exists(lock_file):
+                        try:
+                            os.remove(lock_file)
+                            print(
+                                f"  → ロックファイル削除: {os.path.basename(lock_file)}"
+                            )
+                        except:
+                            pass
+
+                chrome_options.add_argument(f"--user-data-dir={profile_path}")
+                chrome_options.add_argument("--profile-directory=Default")
+
+                # 基本設定
+                chrome_options.add_argument("--no-sandbox")
+                chrome_options.add_argument("--disable-dev-shm-usage")
+                chrome_options.add_argument(
+                    "--disable-blink-features=AutomationControlled"
                 )
-                driver.implicitly_wait(10)
+                chrome_options.add_argument("--disable-gpu")
+                chrome_options.add_argument("--disable-notifications")
+                chrome_options.add_argument("--disable-popup-blocking")
+                chrome_options.add_argument("--no-first-run")
+                chrome_options.add_argument("--no-default-browser-check")
 
-                # ポート情報を保持
-                driver._debug_port = port
-                driver._temp_dir = temp_dir
+                # 動的ポート割り当て
+                port = self._get_free_port()
+                chrome_options.add_argument(f"--remote-debugging-port={port}")
 
-                print(f"  ✓ ドライバー起動成功 (ポート: {port})")
-                return driver
+                # プロキシ設定
+                if proxy_url:
+                    if "@" in proxy_url:
+                        # http://username:password@host:port の形式から分解
+                        try:
+                            auth_part = proxy_url.split("//")[1].split("@")[0]
+                            proxy_username, proxy_password = auth_part.split(":")
+                            host_part = proxy_url.split("@")[1]
+                            proxy_host, proxy_port_str = host_part.split(":")
 
-            finally:
-                # 環境変数を元に戻す
-                if old_temp:
-                    os.environ["TEMP"] = old_temp
+                            # プロキシ認証拡張機能を作成
+                            import zipfile
+
+                            manifest_json = """
+                            {
+                                "version": "1.0.0",
+                                "manifest_version": 2,
+                                "name": "Chrome Proxy",
+                                "permissions": [
+                                    "proxy",
+                                    "tabs",
+                                    "unlimitedStorage",
+                                    "storage",
+                                    "<all_urls>",
+                                    "webRequest",
+                                    "webRequestBlocking"
+                                ],
+                                "background": {
+                                    "scripts": ["background.js"]
+                                },
+                                "minimum_chrome_version":"22.0.0"
+                            }
+                            """
+
+                            background_js = """
+                            var config = {
+                                    mode: "fixed_servers",
+                                    rules: {
+                                    singleProxy: {
+                                        scheme: "http",
+                                        host: "%s",
+                                        port: parseInt(%s)
+                                    },
+                                    bypassList: ["localhost"]
+                                    }
+                                };
+
+                            chrome.proxy.settings.set({value: config, scope: "regular"}, function() {});
+
+                            function callbackFn(details) {
+                                return {
+                                    authCredentials: {
+                                        username: "%s",
+                                        password: "%s"
+                                    }
+                                };
+                            }
+
+                            chrome.webRequest.onAuthRequired.addListener(
+                                        callbackFn,
+                                        {urls: ["<all_urls>"]},
+                                        ['blocking']
+                            );
+                            """ % (
+                                proxy_host,
+                                proxy_port_str,
+                                proxy_username,
+                                proxy_password,
+                            )
+
+                            # 拡張機能を作成
+                            proxy_extension = f'proxy_auth_plugin_{account_email.replace("@", "_")}.zip'
+                            with zipfile.ZipFile(proxy_extension, "w") as zp:
+                                zp.writestr("manifest.json", manifest_json)
+                                zp.writestr("background.js", background_js)
+
+                            chrome_options.add_extension(proxy_extension)
+                            print(f"  → プロキシ設定: {proxy_host}:{proxy_port_str}")
+                        except:
+                            # 分解に失敗した場合は通常のプロキシ設定
+                            chrome_options.add_argument(f"--proxy-server={proxy_url}")
+                            print(f"  → プロキシ設定: {proxy_url}")
+                    else:
+                        chrome_options.add_argument(f"--proxy-server={proxy_url}")
+                        print(f"  → プロキシ設定: {proxy_url}")
+
+                # 一時ディレクトリを個別に設定
+                temp_dir = tempfile.mkdtemp(
+                    prefix=f"uc_{account_email.replace('@', '_')}_"
+                )
+
+                # 環境変数で一時ディレクトリを指定
+                old_temp = os.environ.get("TEMP")
+                old_tmp = os.environ.get("TMP")
+                os.environ["TEMP"] = temp_dir
+                os.environ["TMP"] = temp_dir
+
+                try:
+                    # ドライバー作成
+                    driver = uc.Chrome(
+                        options=chrome_options,
+                        version_main=139,
+                        driver_executable_path=None,
+                        use_subprocess=True,
+                    )
+                    driver.implicitly_wait(10)
+
+                    # ポート情報を保持
+                    driver._debug_port = port
+                    driver._temp_dir = temp_dir
+
+                    print(f"  ✓ ドライバー起動成功 (ポート: {port})")
+
+                    # プロキシ拡張ファイルを削除
+                    if proxy_extension and os.path.exists(proxy_extension):
+                        try:
+                            os.remove(proxy_extension)
+                        except:
+                            pass
+
+                    return driver
+
+                finally:
+                    # 環境変数を元に戻す
+                    if old_temp:
+                        os.environ["TEMP"] = old_temp
+                    else:
+                        if "TEMP" in os.environ:
+                            del os.environ["TEMP"]
+
+                    if old_tmp:
+                        os.environ["TMP"] = old_tmp
+                    else:
+                        if "TMP" in os.environ:
+                            del os.environ["TMP"]
+
+            except Exception as e:
+                if port:
+                    self._release_port(port)
+
+                # プロキシ拡張ファイルを削除
+                if proxy_extension and os.path.exists(proxy_extension):
+                    try:
+                        os.remove(proxy_extension)
+                    except:
+                        pass
+
+                if attempt < max_retries - 1:
+                    print(
+                        f"  ⚠ 起動失敗 (試行 {attempt + 1}/{max_retries}): {str(e)[:50]}"
+                    )
+                    time.sleep(3)
+                    continue
                 else:
-                    del os.environ["TEMP"]
-
-                if old_tmp:
-                    os.environ["TMP"] = old_tmp
-                else:
-                    del os.environ["TMP"]
-
-        except Exception as e:
-            print(f"  ✗ ドライバー作成エラー: {str(e)[:100]}")
-            if port:
-                self._release_port(port)
-            return None
+                    print(f"  ✗ ドライバー作成エラー: {str(e)[:100]}")
+                    return None
 
     def close_driver(self, driver: webdriver.Chrome):
         """ドライバーを安全に終了"""
@@ -208,6 +337,13 @@ class ProfileManager:
     ) -> bool:
         """一時プロファイルを永続プロファイルに移行"""
         try:
+            # 一時プロファイルが存在するか確認
+            if not os.path.exists(temp_profile_path):
+                print(
+                    f"  ⚠ 一時プロファイルが既に削除されています: {temp_profile_path}"
+                )
+                return False
+
             permanent_path = self.get_profile_path(account_email)
 
             if os.path.exists(permanent_path):
@@ -229,6 +365,17 @@ class ProfileManager:
 
         except Exception as e:
             print(f"  ✗ プロファイル移行エラー: {str(e)[:100]}")
+            # エラーでも永続プロファイルを作成
+            permanent_path = self.get_profile_path(account_email)
+            os.makedirs(permanent_path, exist_ok=True)
+            self.save_profile_info(
+                account_email,
+                {
+                    "created_at": datetime.now().isoformat(),
+                    "login_status": "logged_in",
+                    "cookies_saved": True,
+                },
+            )
             return False
 
     def cleanup_temp_profiles(self):

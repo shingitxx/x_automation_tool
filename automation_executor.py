@@ -20,6 +20,7 @@ class AutomationExecutor:
     """X自動操作実行エンジン（安定版・逐次処理）"""
 
     def __init__(self):
+        self.startup_event = threading.Event()  # 起動完了通知用
         self.account_manager = AccountManager()
         self.profile_manager = ProfileManager()
         self.reply_texts = []
@@ -99,12 +100,40 @@ class AutomationExecutor:
             return selected
         return None
 
+    def wait_for_page_load(self, driver: webdriver.Chrome, timeout: int = 30) -> bool:
+        """ページの完全読み込みを待機"""
+        try:
+            # JavaScriptの読み込み完了を確認
+            WebDriverWait(driver, timeout).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )
+
+            # X(Twitter)の主要要素の読み込みを確認
+            WebDriverWait(driver, timeout).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "article"))
+            )
+
+            # 動的コンテンツの安定化待機
+            time.sleep(3)
+
+            print("    ✓ ページ読み込み完了")
+            return True
+
+        except TimeoutException:
+            print("    ⚠ ページ読み込みタイムアウト")
+            return False
+        except Exception as e:
+            print(f"    ⚠ ページ読み込みエラー: {str(e)[:50]}")
+            return False
+
     def execute_like(self, driver: webdriver.Chrome, url: str) -> bool:
         """いいね実行"""
         try:
             if url not in driver.current_url:
                 driver.get(url)
-                time.sleep(5)
+                # ページ完全読み込み待機を追加
+                if not self.wait_for_page_load(driver):
+                    return False
 
             # 既にいいね済みチェック
             try:
@@ -135,7 +164,9 @@ class AutomationExecutor:
         try:
             if url not in driver.current_url:
                 driver.get(url)
-                time.sleep(5)
+                # ページ完全読み込み待機を追加
+                if not self.wait_for_page_load(driver):
+                    return False
 
             # 既にブックマーク済みチェック
             try:
@@ -167,7 +198,9 @@ class AutomationExecutor:
         try:
             if url not in driver.current_url:
                 driver.get(url)
-                time.sleep(5)
+                # ページ完全読み込み待機を追加
+                if not self.wait_for_page_load(driver):
+                    return False
 
             # 既にリツイート済みチェック
             try:
@@ -214,7 +247,9 @@ class AutomationExecutor:
         try:
             if url not in driver.current_url:
                 driver.get(url)
-                time.sleep(5)
+                # ページ完全読み込み待機を追加
+                if not self.wait_for_page_load(driver):
+                    return False
 
             # リプライボタンクリック
             reply_button = driver.find_element(By.CSS_SELECTOR, "[data-testid='reply']")
@@ -547,13 +582,136 @@ class AutomationExecutor:
         batch_index: int = 0,
     ):
         """スレッドワーカー（並列実行用）"""
-        # 段階的起動のための待機
-        if batch_index > 0:
-            startup_delay = batch_index * random.uniform(5, 10)
-            print(f"[{account_id}] 起動待機中... ({startup_delay:.1f}秒)")
-            time.sleep(startup_delay)
 
-        result = self.process_single_account(
-            account_id, target_url, actions, wait_range
-        )
+        # 2番目以降は前のアカウントの起動完了を待つ
+        if batch_index > 0:
+            print(f"[{account_id}] 前のアカウントの起動完了待機中...")
+            if not hasattr(self, "startup_events"):
+                self.startup_events = {}
+
+            while batch_index - 1 not in self.startup_events:
+                time.sleep(0.5)
+
+            self.startup_events[batch_index - 1].wait()
+            print(f"[{account_id}] 起動開始")
+
+        # 自分用のイベントを作成
+        if not hasattr(self, "startup_events"):
+            self.startup_events = {}
+        self.startup_events[batch_index] = threading.Event()
+
+        # ドライバー起動部分だけを先に実行
+        account = self.account_manager.get_account_by_id(account_id)
+        if not account:
+            result = {
+                "account_id": account_id,
+                "email": "",
+                "url": target_url,
+                "success": False,
+                "actions_performed": [],
+                "errors": ["アカウントが見つかりません"],
+                "timestamp": datetime.now().isoformat(),
+            }
+            self.startup_events[batch_index].set()  # エラーでも通知
+            result_queue.put(result)
+            return
+
+        print(f"[{account_id}] {account['email']} - 処理開始")
+
+        # ドライバー起動
+        driver = self.setup_driver_with_profile(account_id)
+
+        # 起動完了したら即座に次のアカウントに通知
+        if driver:
+            print(f"[{account_id}] 起動完了 → 次のアカウントへ通知")
+            self.startup_events[batch_index].set()
+
+            # 以降のタスクは並列で実行
+            result = self._execute_tasks(
+                driver, account, account_id, target_url, actions, wait_range
+            )
+        else:
+            # 起動失敗でも通知（無限待機防止）
+            self.startup_events[batch_index].set()
+            result = {
+                "account_id": account_id,
+                "email": account["email"],
+                "url": target_url,
+                "success": False,
+                "actions_performed": [],
+                "errors": ["ドライバー起動失敗"],
+                "timestamp": datetime.now().isoformat(),
+            }
+
         result_queue.put(result)
+
+    def _execute_tasks(
+        self,
+        driver: webdriver.Chrome,
+        account: Dict,
+        account_id: int,
+        target_url: str,
+        actions: Dict[str, bool],
+        wait_range: Tuple[int, int],
+    ) -> Dict:
+        """タスク実行部分（並列実行される）"""
+        result = {
+            "account_id": account_id,
+            "email": account["email"],
+            "url": target_url,
+            "success": False,
+            "actions_performed": [],
+            "errors": [],
+            "timestamp": datetime.now().isoformat(),
+        }
+
+        try:
+            # ログイン確認
+            if not self.check_login_status(driver):
+                result["errors"].append("ログイン状態確認失敗")
+                return result
+
+            print(f"[{account_id}] ✓ ログイン確認完了")
+
+            # 各アクション実行
+            if actions.get("like", False):
+                print(f"[{account_id}] 実行: いいね")
+                if self.execute_like(driver, target_url):
+                    result["actions_performed"].append("like")
+                    print(f"[{account_id}] ✓ いいね完了")
+                    time.sleep(random.uniform(wait_range[0], wait_range[1]))
+
+            if actions.get("bookmark", False):
+                print(f"[{account_id}] 実行: ブックマーク")
+                if self.execute_bookmark(driver, target_url):
+                    result["actions_performed"].append("bookmark")
+                    print(f"[{account_id}] ✓ ブックマーク完了")
+                    time.sleep(random.uniform(wait_range[0], wait_range[1]))
+
+            if actions.get("retweet", False):
+                print(f"[{account_id}] 実行: リツイート")
+                if self.execute_retweet(driver, target_url):
+                    result["actions_performed"].append("retweet")
+                    print(f"[{account_id}] ✓ リツイート完了")
+                    time.sleep(random.uniform(wait_range[0], wait_range[1]))
+
+            if actions.get("reply", False):
+                reply_text = self.get_random_reply()
+                if reply_text:
+                    print(f"[{account_id}] 実行: リプライ")
+                    if self.execute_reply(driver, target_url, reply_text):
+                        result["actions_performed"].append("reply")
+                        print(f"[{account_id}] ✓ リプライ完了")
+
+            result["success"] = len(result["actions_performed"]) > 0
+
+            if result["success"]:
+                print(
+                    f"[{account_id}] ✅ 完了: {', '.join(result['actions_performed'])}"
+                )
+
+        finally:
+            self.profile_manager.close_driver(driver)
+            time.sleep(2)
+
+        return result

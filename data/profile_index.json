@@ -1,18 +1,522 @@
 {
   "profiles": {
-    "exdel81": {
-      "email": "exdel81",
-      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_exdel81",
-      "created_at": "2025-09-04T22:32:30",
-      "last_used": "2025-09-04T22:32:30.113776",
+    "aaronlvn2966": {
+      "email": "aaronlvn2966",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_aaronlvn2966",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "abueno.pasabers": {
+      "email": "abueno.pasabers",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_abueno_pasabers",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "allexposeddds": {
+      "email": "allexposeddds",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_allexposeddds",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "angel.carreon.": {
+      "email": "angel.carreon.",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_angel_carreon_",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "arciiibanana": {
+      "email": "arciiibanana",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_arciiibanana",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "carliff.": {
+      "email": "carliff.",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_carliff_",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "chi12567": {
+      "email": "chi12567",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_chi12567",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "ciroblanco10": {
+      "email": "ciroblanco10",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_ciroblanco10",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "compitacris": {
+      "email": "compitacris",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_compitacris",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "constantinekli1": {
+      "email": "constantinekli1",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_constantinekli1",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "covarrubias66.": {
+      "email": "covarrubias66.",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_covarrubias66_",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "crew2.jsd": {
+      "email": "crew2.jsd",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_crew2_jsd",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "daus16958": {
+      "email": "daus16958",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_daus16958",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "devaqs": {
+      "email": "devaqs",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_devaqs",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "diego1316942": {
+      "email": "diego1316942",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_diego1316942",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "djepicofficial1": {
+      "email": "djepicofficial1",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_djepicofficial1",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "edwinm.00": {
+      "email": "edwinm.00",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_edwinm_00",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
       "login_status": "logged_in",
       "cookies_saved": true
     },
     "ehjonesy": {
       "email": "ehjonesy",
       "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_ehjonesy",
-      "created_at": "2025-09-04T22:40:01",
-      "last_used": "2025-09-04T22:40:01.863052",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "einsmax2": {
+      "email": "einsmax2",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_einsmax2",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "eliciuri": {
+      "email": "eliciuri",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_eliciuri",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "ellism990": {
+      "email": "ellism990",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_ellism990",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "elodie.wan": {
+      "email": "elodie.wan",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_elodie_wan",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "emily.fjk": {
+      "email": "emily.fjk",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_emily_fjk",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "enlasombra22": {
+      "email": "enlasombra22",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_enlasombra22",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "eskerino02": {
+      "email": "eskerino02",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_eskerino02",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "f49ry1": {
+      "email": "f49ry1",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_f49ry1",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "farrington4733": {
+      "email": "farrington4733",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_farrington4733",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "fett.dominik": {
+      "email": "fett.dominik",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_fett_dominik",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "fetzerei12": {
+      "email": "fetzerei12",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_fetzerei12",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "filtroarte": {
+      "email": "filtroarte",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_filtroarte",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "funiseverywhere": {
+      "email": "funiseverywhere",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_funiseverywhere",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "goblingoo56": {
+      "email": "goblingoo56",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_goblingoo56",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "goldeng97054639": {
+      "email": "goldeng97054639",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_goldeng97054639",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "John.L83": {
+      "email": "John.L83",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_John_L83",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "MattRicher4": {
+      "email": "MattRicher4",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_MattRicher4",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "Pandasurreal1": {
+      "email": "Pandasurreal1",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_Pandasurreal1",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "PhlWichy": {
+      "email": "PhlWichy",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_PhlWichy",
+      "created_at": "2025-09-07T03:36:52.231253",
+      "last_used": "2025-09-07T03:36:52.232263",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "Pkarki0120": {
+      "email": "Pkarki0120",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_Pkarki0120",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "Plan.s": {
+      "email": "Plan.s",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_Plan_s",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "SAFI.783": {
+      "email": "SAFI.783",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_SAFI_783",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "SavaniLp": {
+      "email": "SavaniLp",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_SavaniLp",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "SteenVinten": {
+      "email": "SteenVinten",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_SteenVinten",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "TimKnig2624183": {
+      "email": "TimKnig2624183",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_TimKnig2624183",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "VaranyCTR": {
+      "email": "VaranyCTR",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_VaranyCTR",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "VelascoMagerR": {
+      "email": "VelascoMagerR",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_VelascoMagerR",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "VX.Blood.Eagle": {
+      "email": "VX.Blood.Eagle",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_VX_Blood_Eagle",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "Yam8115": {
+      "email": "Yam8115",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_Yam8115",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "Zzzzzzzzzzzuwu": {
+      "email": "Zzzzzzzzzzzuwu",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_Zzzzzzzzzzzuwu",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    ".tom.pere": {
+      "email": ".tom.pere",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile__tom_pere",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "..ka..ma..": {
+      "email": "..ka..ma..",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile___ka__ma__",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:42:19.325378",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "abueno_pasabers": {
+      "email": "abueno_pasabers",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_abueno_pasabers",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "John_L83": {
+      "email": "John_L83",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_John_L83",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "fett_dominik": {
+      "email": "fett_dominik",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_fett_dominik",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "covarrubias66_": {
+      "email": "covarrubias66_",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_covarrubias66_",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "carliff_": {
+      "email": "carliff_",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_carliff_",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "edwinm_00": {
+      "email": "edwinm_00",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_edwinm_00",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "emily_fjk": {
+      "email": "emily_fjk",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_emily_fjk",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "angel_carreon_": {
+      "email": "angel_carreon_",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_angel_carreon_",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "SAFI_783": {
+      "email": "SAFI_783",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_SAFI_783",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "elodie_wan": {
+      "email": "elodie_wan",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_elodie_wan",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "Plan_s": {
+      "email": "Plan_s",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_Plan_s",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "VX_Blood_Eagle": {
+      "email": "VX_Blood_Eagle",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_VX_Blood_Eagle",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "__ka__ma__": {
+      "email": "__ka__ma__",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile___ka__ma__",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "crew2_jsd": {
+      "email": "crew2_jsd",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile_crew2_jsd",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
+      "login_status": "logged_in",
+      "cookies_saved": true
+    },
+    "_tom_pere": {
+      "email": "_tom_pere",
+      "profile_path": "C:\\Users\\nextS\\MyApps\\x_automation_tool\\profiles\\profile__tom_pere",
+      "created_at": "2025-09-05T00:00:00",
+      "last_used": "2025-09-07T01:45:01.236025",
       "login_status": "logged_in",
       "cookies_saved": true
     }

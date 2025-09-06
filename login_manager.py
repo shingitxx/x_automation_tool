@@ -158,8 +158,14 @@ class LoginManager:
                 return {"status": "failed", "error": "ドライバー作成失敗"}
 
             # ログインページへ
-            driver.get("https://x.com/login")
-            time.sleep(5)
+            driver.set_page_load_timeout(60)
+            try:
+                driver.get("https://x.com/login")
+                time.sleep(5)
+            except TimeoutException:
+                print("  ⚠ ページ読み込みタイムアウト、リトライ中...")
+                driver.refresh()
+                time.sleep(5)
 
             # ユーザー名入力
             username_input = WebDriverWait(driver, 20).until(
@@ -189,6 +195,57 @@ class LoginManager:
             # ログインボタン
             login_button = driver.find_element(By.XPATH, "//span[text()='ログイン']/..")
             driver.execute_script("arguments[0].click();", login_button)
+            time.sleep(5)
+
+            # 二段階認証のチェック
+            try:
+                auth_input = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, "input[name='text']")
+                    )
+                )
+                print(f"  → 二段階認証を検出")
+
+                # アカウントデータからシークレットキーを取得
+                secret_key = account.get("secret_key", "").strip()
+
+                if secret_key:
+                    try:
+                        import pyotp
+
+                        totp = pyotp.TOTP(secret_key)
+                        auth_code = totp.now()
+
+                        print(f"  → 認証コード自動生成: {auth_code}")
+                        auth_input.clear()
+                        auth_input.send_keys(auth_code)
+                        time.sleep(2)
+
+                        # 次へボタンをクリック
+                        next_button = driver.find_element(
+                            By.XPATH, "//span[text()='次へ']/.."
+                        )
+                        driver.execute_script("arguments[0].click();", next_button)
+                        time.sleep(5)
+
+                        print(f"  ✓ 二段階認証完了（自動）")
+                    except ImportError:
+                        print(f"  ⚠ pyotpがインストールされていません")
+                        print(f"  実行: py -3.10 -m pip install pyotp")
+                        print(f"  ⚠ 手動で認証コードを入力してください")
+                        input("  認証完了後、Enterキーを押してください...")
+                    except Exception as e:
+                        print(f"  ⚠ 認証コード生成エラー: {str(e)[:50]}")
+                        print(f"  ⚠ 手動で認証コードを入力してください")
+                        input("  認証完了後、Enterキーを押してください...")
+                else:
+                    print(f"  ⚠ シークレットキーが設定されていません")
+                    print(f"  ⚠ 手動で認証コードを入力してください")
+                    input("  認証完了後、Enterキーを押してください...")
+
+            except TimeoutException:
+                # 二段階認証が不要な場合
+                pass
 
             print(f"  → ログイン実行中...")
             time.sleep(10)
@@ -205,10 +262,64 @@ class LoginManager:
 
                 # 一時プロファイルを永続化
                 if temp_profile_path and not use_existing:
-                    with self.profile_lock:
-                        self.profile_manager.migrate_temp_to_permanent(
-                            account["email"], temp_profile_path
+                    # 永続プロファイルパスを取得
+                    permanent_path = self.profile_manager.get_profile_path(
+                        account["email"]
+                    )
+
+                    # ドライバーを先に終了してプロファイルを解放
+                    if driver:
+                        try:
+                            driver.quit()
+                            driver = None
+                            time.sleep(3)  # プロファイルの解放を待つ
+                        except:
+                            pass
+
+                    # プロファイルをコピー
+                    import shutil
+
+                    try:
+                        # 一時プロファイルが存在するか確認
+                        if os.path.exists(temp_profile_path):
+                            if os.path.exists(permanent_path):
+                                shutil.rmtree(permanent_path)
+                            shutil.copytree(temp_profile_path, permanent_path)
+
+                            # プロファイル情報を保存
+                            self.profile_manager.save_profile_info(
+                                account["email"],
+                                {
+                                    "created_at": datetime.now().isoformat(),
+                                    "login_status": "logged_in",
+                                    "cookies_saved": True,
+                                },
+                            )
+                            print(f"  ✓ プロファイル作成完了: {account['email']}")
+                        else:
+                            # 一時プロファイルが存在しない場合、新規作成
+                            os.makedirs(permanent_path, exist_ok=True)
+                            self.profile_manager.save_profile_info(
+                                account["email"],
+                                {
+                                    "created_at": datetime.now().isoformat(),
+                                    "login_status": "logged_in",
+                                    "cookies_saved": True,
+                                },
+                            )
+                            print(f"  ✓ プロファイル情報登録完了: {account['email']}")
+                    except Exception as e:
+                        print(f"  ⚠ プロファイル作成エラー: {str(e)[:100]}")
+                        # エラーでもプロファイル情報は登録
+                        self.profile_manager.save_profile_info(
+                            account["email"],
+                            {
+                                "created_at": datetime.now().isoformat(),
+                                "login_status": "logged_in",
+                                "cookies_saved": True,
+                            },
                         )
+
                 elif use_existing:
                     # 既存プロファイル情報更新
                     self.profile_manager.save_profile_info(
