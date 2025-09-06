@@ -126,7 +126,7 @@ class LoginManager:
         finally:
             if driver:
                 try:
-                    driver.quit()
+                    self.profile_manager.close_driver(driver)
                 except:
                     pass
 
@@ -233,7 +233,7 @@ class LoginManager:
         finally:
             if driver:
                 try:
-                    driver.quit()
+                    self.profile_manager.close_driver(driver)
                 except:
                     pass
 

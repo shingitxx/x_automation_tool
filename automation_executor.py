@@ -346,7 +346,7 @@ class AutomationExecutor:
         finally:
             if driver:
                 try:
-                    driver.quit()
+                    self.profile_manager.close_driver(driver)
                     time.sleep(2)  # ドライバー完全終了を待つ
                 except:
                     pass
@@ -457,7 +457,7 @@ class AutomationExecutor:
         target_url: str,
         actions: Dict[str, bool],
         wait_range: Tuple[int, int],
-        max_workers: int = 3,  # max_concurrent から max_workers に変更
+        max_workers: int = 3,
     ) -> List[Dict]:
         """並列実行（複数アカウント同時処理）"""
         results = []
@@ -469,7 +469,7 @@ class AutomationExecutor:
         print(f"対象URL: {target_url}")
         print(f"実行操作: {', '.join([k for k, v in actions.items() if v])}")
         print(f"アカウント数: {total_accounts}")
-        print(f"同時実行数: {max_workers}")  # max_concurrent から max_workers に変更
+        print(f"同時実行数: {max_workers}")
         print(f"待機時間: {wait_range[0]}-{wait_range[1]}秒")
         print(f"{'='*60}")
 
@@ -489,29 +489,30 @@ class AutomationExecutor:
             return results
 
         # バッチ処理
-        for i in range(
-            0, len(valid_accounts), max_workers
-        ):  # max_concurrent から max_workers に変更
-            batch = valid_accounts[
-                i : i + max_workers
-            ]  # max_concurrent から max_workers に変更
-            batch_num = (i // max_workers) + 1  # max_concurrent から max_workers に変更
-            total_batches = (
-                len(valid_accounts) + max_workers - 1
-            ) // max_workers  # max_concurrent から max_workers に変更
+        for i in range(0, len(valid_accounts), max_workers):
+            batch = valid_accounts[i : i + max_workers]
+            batch_num = (i // max_workers) + 1
+            total_batches = (len(valid_accounts) + max_workers - 1) // max_workers
 
             print(f"\nバッチ {batch_num}/{total_batches} 処理開始")
             print(f"アカウント: {batch}")
 
-            # スレッドプールで並列実行
+            # スレッドプールで並列実行（段階的起動）
             threads = []
             batch_results = []
             result_queue = Queue()
 
-            for account_id in batch:
+            for idx, account_id in enumerate(batch):
                 thread = threading.Thread(
                     target=self._thread_worker,
-                    args=(account_id, target_url, actions, wait_range, result_queue),
+                    args=(
+                        account_id,
+                        target_url,
+                        actions,
+                        wait_range,
+                        result_queue,
+                        idx,
+                    ),
                 )
                 threads.append(thread)
                 thread.start()
@@ -527,9 +528,7 @@ class AutomationExecutor:
             results.extend(batch_results)
 
             # 次のバッチまでの間隔
-            if i + max_workers < len(
-                valid_accounts
-            ):  # max_concurrent から max_workers に変更
+            if i + max_workers < len(valid_accounts):
                 interval = random.uniform(5, 10)
                 print(f"\n次のバッチまで {interval:.1f} 秒待機...")
                 time.sleep(interval)
@@ -545,8 +544,15 @@ class AutomationExecutor:
         actions: Dict[str, bool],
         wait_range: Tuple[int, int],
         result_queue: Queue,
+        batch_index: int = 0,
     ):
         """スレッドワーカー（並列実行用）"""
+        # 段階的起動のための待機
+        if batch_index > 0:
+            startup_delay = batch_index * random.uniform(5, 10)
+            print(f"[{account_id}] 起動待機中... ({startup_delay:.1f}秒)")
+            time.sleep(startup_delay)
+
         result = self.process_single_account(
             account_id, target_url, actions, wait_range
         )

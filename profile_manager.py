@@ -9,8 +9,8 @@ from selenium.webdriver.common.by import By
 import time
 import tempfile
 import uuid
-import tempfile
-import shutil
+import threading
+import random
 
 
 class ProfileManager:
@@ -29,6 +29,10 @@ class ProfileManager:
         # プロファイルインデックス読み込み
         self.profile_index = self._load_profile_index()
 
+        # ポート管理用
+        self.used_ports = set()
+        self.port_lock = threading.Lock()
+
     def _load_profile_index(self) -> Dict:
         """プロファイルインデックス読み込み"""
         if os.path.exists(self.profile_index_file):
@@ -40,6 +44,20 @@ class ProfileManager:
         """プロファイルインデックス保存"""
         with open(self.profile_index_file, "w", encoding="utf-8") as f:
             json.dump(self.profile_index, f, ensure_ascii=False, indent=2)
+
+    def _get_free_port(self) -> int:
+        """未使用のポート番号を取得"""
+        with self.port_lock:
+            port = random.randint(9500, 9999)
+            while port in self.used_ports:
+                port = random.randint(9500, 9999)
+            self.used_ports.add(port)
+            return port
+
+    def _release_port(self, port: int):
+        """ポート番号を解放"""
+        with self.port_lock:
+            self.used_ports.discard(port)
 
     def get_profile_path(self, account_email: str) -> str:
         """アカウント用プロファイルパス取得（絶対パス版）"""
@@ -72,11 +90,12 @@ class ProfileManager:
         proxy_url: Optional[str] = None,
         use_temp: bool = False,
     ) -> Optional[webdriver.Chrome]:
-        """プロファイル付きドライバー作成"""
+        """プロファイル付きドライバー作成（修正版）"""
+        port = None
         try:
             chrome_options = uc.ChromeOptions()
 
-            # プロファイル設定（元の形に戻す）
+            # プロファイル設定
             if use_temp:
                 profile_path = self.get_temp_profile_path(account_email)
                 print(f"  → 一時プロファイル使用: {os.path.basename(profile_path)}")
@@ -87,13 +106,17 @@ class ProfileManager:
             chrome_options.add_argument(f"--user-data-dir={profile_path}")
             chrome_options.add_argument("--profile-directory=Default")
 
-            # 基本設定（元の設定に戻す）
+            # 基本設定
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--disable-blink-features=AutomationControlled")
             chrome_options.add_argument("--disable-gpu")
             chrome_options.add_argument("--disable-notifications")
             chrome_options.add_argument("--disable-popup-blocking")
+
+            # 動的ポート割り当て
+            port = self._get_free_port()
+            chrome_options.add_argument(f"--remote-debugging-port={port}")
 
             # プロキシ設定
             if proxy_url:
@@ -106,16 +129,67 @@ class ProfileManager:
                 chrome_options.add_argument(f"--proxy-server={proxy_server}")
                 print(f"  → プロキシ設定: {proxy_server}")
 
-            # ドライバー作成（元の設定に戻す）
-            driver = uc.Chrome(options=chrome_options, version_main=139)
-            driver.implicitly_wait(10)
+            # 一時ディレクトリを個別に設定
+            temp_dir = tempfile.mkdtemp(prefix=f"uc_{account_email.replace('@', '_')}_")
 
-            print(f"  ✓ ドライバー起動成功")
-            return driver
+            # 環境変数で一時ディレクトリを指定
+            old_temp = os.environ.get("TEMP")
+            old_tmp = os.environ.get("TMP")
+            os.environ["TEMP"] = temp_dir
+            os.environ["TMP"] = temp_dir
+
+            try:
+                # ドライバー作成
+                driver = uc.Chrome(
+                    options=chrome_options,
+                    version_main=139,
+                    driver_executable_path=None,
+                    use_subprocess=True,
+                )
+                driver.implicitly_wait(10)
+
+                # ポート情報を保持
+                driver._debug_port = port
+                driver._temp_dir = temp_dir
+
+                print(f"  ✓ ドライバー起動成功 (ポート: {port})")
+                return driver
+
+            finally:
+                # 環境変数を元に戻す
+                if old_temp:
+                    os.environ["TEMP"] = old_temp
+                else:
+                    del os.environ["TEMP"]
+
+                if old_tmp:
+                    os.environ["TMP"] = old_tmp
+                else:
+                    del os.environ["TMP"]
 
         except Exception as e:
             print(f"  ✗ ドライバー作成エラー: {str(e)[:100]}")
+            if port:
+                self._release_port(port)
             return None
+
+    def close_driver(self, driver: webdriver.Chrome):
+        """ドライバーを安全に終了"""
+        try:
+            # ポート解放
+            if hasattr(driver, "_debug_port"):
+                self._release_port(driver._debug_port)
+
+            # 一時ディレクトリ削除
+            if hasattr(driver, "_temp_dir") and os.path.exists(driver._temp_dir):
+                try:
+                    shutil.rmtree(driver._temp_dir)
+                except:
+                    pass
+
+            driver.quit()
+        except:
+            pass
 
     def save_profile_info(self, account_email: str, info: Dict):
         """プロファイル情報保存"""
@@ -222,6 +296,6 @@ class ProfileManager:
         finally:
             if driver:
                 try:
-                    driver.quit()
+                    self.close_driver(driver)
                 except:
                     pass

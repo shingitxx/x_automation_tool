@@ -1,0 +1,13 @@
+[
+  {
+    "account_id": 1,
+    "email": "exdel81",
+    "url": "https://x.com/AnnetteFul33572/status/1963936344423743581",
+    "success": false,
+    "actions_performed": [],
+    "errors": [
+      "実行エラー: Message: invalid argument: cannot parse capability: goog:chromeOptions\nfrom invalid argument: unreco"
+    ],
+    "timestamp": "2025-09-05T22:46:52.612446"
+  }
+]
