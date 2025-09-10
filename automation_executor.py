@@ -917,6 +917,22 @@ class AutomationExecutor:
             )
             time.sleep(2)  # 追加の安定待機
 
+            # まず最初にCloudflareチェック（プロファイル起動時の場合）
+            from cloudflare_handler import CloudflareHandler
+
+            if CloudflareHandler.is_cloudflare_present(driver):
+                print(f"[{account_id}] → 初回アクセス時にCloudflare検出")
+                if not CloudflareHandler.check_and_handle_cloudflare(driver):
+                    result["errors"].append("Cloudflare解除タイムアウト（初回）")
+                    return result
+                # Cloudflare解除後、再度ホームにアクセス
+                driver.get("https://x.com/home")
+                WebDriverWait(driver, 30).until(
+                    lambda d: d.execute_script("return document.readyState")
+                    == "complete"
+                )
+                time.sleep(2)
+
             # URLをチェック - ログインページにリダイレクトされたか
             current_url = driver.current_url
             if "login" in current_url or "flow/login" in current_url:

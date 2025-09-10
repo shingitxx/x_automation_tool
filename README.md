@@ -1,4 +1,4 @@
-# X自動化ツール v2.0
+# X自動化ツール v2.1
 
 ## 概要
 X（旧Twitter）の自動操作を行うPythonツール。Chromeプロファイルベースの管理により、複数アカウントの安定した並列運用を実現。
@@ -17,17 +17,24 @@ X（旧Twitter）の自動操作を行うPythonツール。Chromeプロファイ
 - プロファイル単位での独立したブラウザ環境
 - プロファイルのロック管理と自動クリーンアップ
 
-### 3. セキュリティ対策
-- **Cloudflare対策**
-  - 手動解除待機機能（最大5分）
-  - 解除後の自動処理継続
+### 3. Cloudflare対策（v2.1で強化）
+- **手動解除待機機能**
+  - Enterキー待機方式で確実な解除確認
+  - 初回ログイン時の対応
+  - プロファイル起動時の対応
   - 明確な解除指示の表示
-- **セッション管理**
-  - セッション切れの自動検出
-  - 自動再ログイン機能
-  - ログイン状態の確実な検証（URL判定方式）
+- **自動検出タイミング**
+  - ログインページアクセス時
+  - ホームページアクセス時
+  - 各操作実行前
 
-### 4. 自動操作機能
+### 4. セッション管理
+- セッション切れの自動検出
+- 自動再ログイン機能
+- ログイン状態の確実な検証（URL判定方式）
+- 二段階認証の自動処理
+
+### 5. 自動操作機能
 - いいね、ブックマーク、リツイート、リプライ
 - 操作後の状態変化検証（誤判定防止）
 - ランダム待機時間による人間的な動作
@@ -43,119 +50,117 @@ X（旧Twitter）の自動操作を行うPythonツール。Chromeプロファイ
 
 ```bash
 # リポジトリのクローン
-git clone [repository-url]
+git clone https://github.com/shingitxx/x_automation_tool.git
 cd x_automation_tool
+
+# ブランチ切り替え
+git checkout feature/clean-automation
 
 # 依存関係のインストール
 pip install -r requirements.txt
-
-必要なライブラリ
-
-undetected-chromedriver
-selenium
-pyotp（二段階認証用）
-その他requirements.txt参照
-
 初期設定
 1. アカウント情報の準備
 config/accounts.csvを作成：
+csvemail,password,proxy_url,secret_key
+user1@example.com,password123,http://user:pass@proxy.com:8080,TOTP_SECRET_KEY
 2. リプライテキストの設定（オプション）
 config/reply_texts.csvを作成：
 csvリプライテキスト
 素晴らしい投稿ですね！
 参考になりました
-ありがとうございます
 使用方法
 1. メインメニューの起動
 bashpython cli_automation.py
 2. 初回ログイン（プロファイル作成）
+
 メニュー「2. 初回ログイン（プロファイル作成）」
-→ 特定番号選択 or 範囲指定 or 全アカウント
+Cloudflareが表示された場合は手動で解除
+Enterキーで処理継続
+
 3. 自動操作の実行
+
 メニュー「8. 自動操作実行（プロファイル版）」
-→ アカウント選択
-→ 対象URL入力
-→ 操作選択（いいね/ブックマーク/リツイート/リプライ）
-4. プロキシテスト
-メニュー「4. プロキシテスト」
-→ アカウント選択でプロキシ接続確認
+プロファイル起動時にCloudflareが出ても自動対応
+
+Cloudflare対応フロー
+初回ログイン時
+
+ログインページでCloudflare検出
+「Cloudflareが検出されました」メッセージ表示
+手動で解除
+Enterキー押下で継続
+
+プロファイル使用時
+
+プロファイル起動時に自動検出
+必要に応じて手動解除待機
+解除後、自動操作継続
+
+トラブルシューティング
+Cloudflareが表示される場合
+
+ターミナルに指示が表示されるまで待つ
+ブラウザで「私は人間です」をクリック
+認証完了を確認
+Enterキーを押して継続
+
+ログイン失敗する場合
+
+プロファイルを削除して再作成
+プロキシの接続を確認
+二段階認証のシークレットキーを確認
+
 ファイル構成
 x_automation_tool/
 ├── config/                      # 設定ファイル
-│   ├── accounts.csv            # アカウント情報
-│   ├── accounts_add.csv        # 追加アカウント用
-│   └── reply_texts.csv         # リプライテキスト
 ├── data/                        # データファイル
-│   ├── account_status.json     # アカウントステータス
-│   └── profile_index.json      # プロファイルインデックス
-├── profiles/                    # Chromeプロファイル保存
-├── temp_profiles/               # 一時プロファイル
-├── cache/                       # Cookieキャッシュ
+├── profiles/                    # Chromeプロファイル
 ├── logs/                        # 実行ログ
-├── backup_test_files_20250908/ # バックアップ
-│
 ├── cli_automation.py            # メインプログラム
 ├── automation_executor.py       # 自動操作エンジン
 ├── login_manager.py            # ログイン管理
 ├── profile_manager.py          # プロファイル管理
-├── account_manager.py          # アカウント管理
 ├── cloudflare_handler.py       # Cloudflare対策
-├── cli_interface.py            # CLI表示管理
-├── proxy_tester.py             # プロキシテスター
-├── totp_handler.py             # 二段階認証処理
-├── requirements.txt            # 依存関係
-├── README.md                   # このファイル
-└── .gitignore                  # Git除外設定
-トラブルシューティング
-Cloudflareが表示される場合
-
-画面の指示に従って手動で解除
-「私は人間です」のチェックボックスをクリック
-最大5分待機後、自動的に処理継続
-
-セッションが切れた場合
-
-システムが自動的に検出し再ログイン
-二段階認証も自動処理（secret_key設定時）
-
-ログイン判定の仕組み
-
-https://x.com/homeにアクセス
-URLのリダイレクトを確認
-
-ログイン済み: /homeのまま
-未ログイン: /flow/loginにリダイレクト
-
-
-未ログインの場合は自動ログイン実行
-
-エラー対処法
-
-ドライバー作成失敗: Chromeプロセスを終了して再実行
-プロファイルロック: ロックファイルを自動削除して再試行
-タイムアウト: ネットワーク接続とプロキシを確認
-
-セキュリティ注意事項
-
-アカウント情報は暗号化されていません
-config/accounts.csvは絶対にGitにコミットしない
-プロキシの品質が動作に大きく影響します
-定期的なプロファイルのバックアップを推奨
-
-制限事項
-
-X利用規約を遵守してください
-過度な自動操作はアカウント制限の原因となります
-1アカウントあたり適切な待機時間を設定してください
-
+└── README.md                   # このファイル
 更新履歴
 
+v2.1.0 (2024-09-10): プロファイル起動時のCloudflare対策、手動解除待機改善
 v2.0.0 (2024-09-10): Cloudflare手動解除、セッション切れ自動再ログイン実装
-v1.9.0: プロファイルベース管理、並列実行対応
-v1.8.0: 二段階認証自動化
 v1.0.0: 初回リリース
 
 ライセンス
 MIT License
-サポート
-Issues: [GitHub Issues URL]
+
+## 引き継ぎテンプレート
+
+```markdown
+# X自動化ツール開発の継続
+
+## プロジェクト情報
+- GitHub: https://github.com/shingitxx/x_automation_tool
+- ブランチ: feature/clean-automation
+- 最終更新: 2024-09-10 夜
+- 動作環境: Windows 11, Python 3.10, Chrome 139
+
+## 本日の実装内容（2024-09-10）
+✅ 完了：
+1. Cloudflare手動解除をEnterキー待機方式に変更
+2. 初回ログイン時のCloudflare対応実装
+3. プロファイル起動時のCloudflare検出機能追加
+4. _execute_tasksメソッドの最初でCloudflareチェック
+
+## 重要な変更ファイル
+- cloudflare_handler.py: input()待機方式に変更
+- login_manager.py: _perform_login_with_profileにCloudflare対応追加  
+- automation_executor.py: _execute_tasksの最初にCloudflareチェック追加
+
+## 動作確認状況
+- 初回ログイン: Cloudflare手動解除OK
+- プロファイル起動: Cloudflare検出OK
+- 自動操作: 正常動作確認済み
+
+## 次回の課題
+- 特になし（現時点で正常動作）
+
+## 質問/依頼
+[具体的な内容を記載]

@@ -84,7 +84,8 @@
       },
       "secret_key": "ZBY4LKE24D5Q5TKF",
       "created_at": "2025-09-07T03:16:06.338936",
-      "status": "not_logged_in"
+      "status": "logged_in",
+      "last_login": "2025-09-10T22:45:45.787019"
     },
     {
       "id": 7,

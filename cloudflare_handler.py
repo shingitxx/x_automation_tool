@@ -20,34 +20,16 @@ class CloudflareHandler:
             print("ブラウザで以下を実行してください：")
             print("1. 「私は人間です」のチェックボックスをクリック")
             print("2. 認証が完了するまで待つ")
-            print("3. X.comのページが表示されるまで待つ")
+            print("3. X.comのページが表示されることを確認")
             print("=" * 60)
-            print(f"最大{timeout}秒待機します...")
+            print("完了したらEnterキーを押してください...")
 
-            # 手動解除を待機
-            start_time = time.time()
-            while time.time() - start_time < timeout:
-                time.sleep(2)
+            # 手動操作の完了を待つ
+            input()
 
-                # Cloudflareが解決されたか確認
-                if not CloudflareHandler.is_cloudflare_present(driver):
-                    # X.comのページに到達したか確認
-                    if (
-                        "x.com" in driver.current_url
-                        or "twitter.com" in driver.current_url
-                    ):
-                        print("✓ Cloudflare解除を確認しました")
-                        time.sleep(3)  # ページ読み込み待機
-                        return True
-
-                # 残り時間を表示（30秒ごと）
-                elapsed = int(time.time() - start_time)
-                if elapsed % 30 == 0 and elapsed > 0:
-                    remaining = timeout - elapsed
-                    print(f"  待機中... (残り{remaining}秒)")
-
-            print("✗ タイムアウト: Cloudflareが解除されませんでした")
-            return False
+            print("✓ 手動解除完了を確認しました")
+            time.sleep(3)  # ページ安定化待機
+            return True
 
         # Cloudflareが表示されていない
         return True

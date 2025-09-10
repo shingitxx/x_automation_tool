@@ -163,26 +163,71 @@ class LoginManager:
             if not driver:
                 return {"status": "failed", "error": "ドライバー作成失敗"}
 
+            # Cloudflare手動解除処理
+            from cloudflare_handler import CloudflareHandler
+
             # ログインページへ
             driver.set_page_load_timeout(60)
             try:
                 driver.get("https://x.com/login")
                 time.sleep(5)
 
-                # Cloudflare手動解除処理
-                from cloudflare_handler import CloudflareHandler
-
+                # Cloudflareチェックと手動解除待機
                 if not CloudflareHandler.check_and_handle_cloudflare(driver):
                     return {"status": "failed", "error": "Cloudflare解除タイムアウト"}
+
+                # Cloudflare解除後、現在のURLを確認
+                current_url = driver.current_url
+                if "home" in current_url and "login" not in current_url:
+                    # すでにログイン済み（Cookieが有効）
+                    print("  ✓ 既にログイン済み（Cookie有効）")
+                    self._save_cookies(driver, account["email"])
+                    self._update_account_status(account["id"], "logged_in")
+
+                    # プロファイル情報を保存
+                    if temp_profile_path and not use_existing:
+                        permanent_path = self.profile_manager.get_profile_path(
+                            account["email"]
+                        )
+                        if driver:
+                            try:
+                                driver.quit()
+                                driver = None
+                                time.sleep(3)
+                            except:
+                                pass
+
+                        import shutil
+
+                        try:
+                            if os.path.exists(temp_profile_path):
+                                if os.path.exists(permanent_path):
+                                    shutil.rmtree(permanent_path)
+                                shutil.copytree(temp_profile_path, permanent_path)
+                                self.profile_manager.save_profile_info(
+                                    account["email"],
+                                    {
+                                        "created_at": datetime.now().isoformat(),
+                                        "login_status": "logged_in",
+                                        "cookies_saved": True,
+                                    },
+                                )
+                                print(f"  ✓ プロファイル作成完了: {account['email']}")
+                        except Exception as e:
+                            print(f"  ⚠ プロファイル作成エラー: {str(e)[:100]}")
+
+                    return {"status": "success"}
+
+                # ログインページにいることを確認
+                if "login" not in driver.current_url:
+                    driver.get("https://x.com/login")
+                    time.sleep(3)
 
             except TimeoutException:
                 print("  ⚠ ページ読み込みタイムアウト、リトライ中...")
                 driver.refresh()
                 time.sleep(5)
-
-                # Cloudflare手動解除処理
-                from cloudflare_handler import CloudflareHandler
-
+                # 再度Cloudflareチェック
                 if not CloudflareHandler.check_and_handle_cloudflare(driver):
                     return {"status": "failed", "error": "Cloudflare解除タイムアウト"}
 
@@ -266,14 +311,33 @@ class LoginManager:
                 # 二段階認証が不要な場合
                 pass
 
-            print(f"  → ログイン実行中...")
-            time.sleep(10)
+            print(f"  → ログイン処理完了待機中...")
 
-            # ログイン成功確認
+            # ログイン完了を待機（最大30秒）
+            try:
+                WebDriverWait(driver, 30).until(
+                    lambda d: "home" in d.current_url.lower()
+                    or "login" not in d.current_url.lower()
+                )
+            except:
+                pass
+
+            time.sleep(5)
+
+            # ホームページに明示的にアクセス
             driver.get("https://x.com/home")
-            time.sleep(3)
+            time.sleep(5)
 
-            if "home" in driver.current_url.lower():
+            # 再度Cloudflareチェック
+            if not CloudflareHandler.check_and_handle_cloudflare(driver):
+                return {
+                    "status": "failed",
+                    "error": "Cloudflare解除タイムアウト（ホーム）",
+                }
+
+            # 最終的なログイン確認
+            current_url = driver.current_url
+            if "home" in current_url and "login" not in current_url:
                 print(f"  ✓ ログイン成功")
 
                 # Cookie保存
@@ -351,7 +415,7 @@ class LoginManager:
 
                 return {"status": "success"}
             else:
-                print(f"  ✗ ログイン失敗")
+                print(f"  ✗ ログイン失敗（最終確認）")
                 return {"status": "failed", "error": "ログイン確認失敗"}
 
         except TimeoutException:
