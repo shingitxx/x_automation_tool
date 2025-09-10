@@ -113,6 +113,12 @@ class LoginManager:
             driver.get("https://x.com/home")
             time.sleep(3)
 
+            # Cloudflare手動解除処理
+            from cloudflare_handler import CloudflareHandler
+
+            if not CloudflareHandler.check_and_handle_cloudflare(driver):
+                return False
+
             # ログイン済み確認
             if "home" in driver.current_url.lower():
                 # Cookie保存
@@ -162,10 +168,23 @@ class LoginManager:
             try:
                 driver.get("https://x.com/login")
                 time.sleep(5)
+
+                # Cloudflare手動解除処理
+                from cloudflare_handler import CloudflareHandler
+
+                if not CloudflareHandler.check_and_handle_cloudflare(driver):
+                    return {"status": "failed", "error": "Cloudflare解除タイムアウト"}
+
             except TimeoutException:
                 print("  ⚠ ページ読み込みタイムアウト、リトライ中...")
                 driver.refresh()
                 time.sleep(5)
+
+                # Cloudflare手動解除処理
+                from cloudflare_handler import CloudflareHandler
+
+                if not CloudflareHandler.check_and_handle_cloudflare(driver):
+                    return {"status": "failed", "error": "Cloudflare解除タイムアウト"}
 
             # ユーザー名入力
             username_input = WebDriverWait(driver, 20).until(

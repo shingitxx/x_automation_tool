@@ -59,11 +59,44 @@ class AutomationExecutor:
             return None
 
     def check_login_status(self, driver: webdriver.Chrome) -> bool:
-        """ログイン状態確認"""
+        """ログイン状態確認（改良版）"""
         try:
             driver.get("https://x.com/home")
-            time.sleep(3)
-            return "home" in driver.current_url.lower()
+            time.sleep(5)
+
+            # ログインボタンが表示されていたら未ログイン
+            try:
+                login_button = driver.find_element(
+                    By.XPATH, "//a[@href='/login']//span[text()='ログイン']"
+                )
+                if login_button:
+                    return False  # 未ログイン
+            except:
+                pass
+
+            # アカウント作成ボタンが表示されていたら未ログイン
+            try:
+                create_button = driver.find_element(
+                    By.XPATH, "//span[text()='アカウント作成']"
+                )
+                if create_button:
+                    return False  # 未ログイン
+            except:
+                pass
+
+            # タイムラインが表示されているか確認
+            try:
+                timeline = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, "[data-testid='primaryColumn']")
+                    )
+                )
+                if timeline:
+                    return True  # ログイン済み
+            except:
+                pass
+
+            return False  # デフォルトは未ログイン
         except:
             return False
 
@@ -160,11 +193,10 @@ class AutomationExecutor:
             return False
 
     def execute_bookmark(self, driver: webdriver.Chrome, url: str) -> bool:
-        """ブックマーク実行"""
+        """ブックマーク実行（検証付き）"""
         try:
             if url not in driver.current_url:
                 driver.get(url)
-                # ページ完全読み込み待機を追加
                 if not self.wait_for_page_load(driver):
                     return False
 
@@ -186,8 +218,24 @@ class AutomationExecutor:
             )
             time.sleep(1)
             driver.execute_script("arguments[0].click();", bookmark_button)
-            time.sleep(2)
-            return True
+            time.sleep(3)
+
+            # ログインモーダルが出たか確認
+            if "login" in driver.current_url or "flow/login" in driver.current_url:
+                print("    ✗ 未ログイン（ログイン画面にリダイレクト）")
+                return False
+
+            # ブックマークが成功したか確認（removeBookmark に変わったか）
+            try:
+                WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, "[data-testid='removeBookmark']")
+                    )
+                )
+                return True
+            except:
+                print("    ✗ ブックマーク失敗（状態変化なし）")
+                return False
 
         except Exception as e:
             print(f"    ✗ ブックマークエラー: {str(e)[:50]}")
@@ -294,7 +342,7 @@ class AutomationExecutor:
         actions: Dict[str, bool],
         wait_range: Tuple[int, int],
     ) -> Dict:
-        """単一アカウント処理（改良版）"""
+        """単一アカウント処理（自動再ログイン機能付き）"""
         result = {
             "account_id": account_id,
             "email": "",
@@ -316,18 +364,164 @@ class AutomationExecutor:
         try:
             print(f"\n[{account_id}] {account['email']} - 処理開始")
 
-            # プロファイル付きドライバー起動（プロキシなし）
+            # プロファイル付きドライバー起動
             driver = self.setup_driver_with_profile(account_id)
             if not driver:
                 result["errors"].append("ドライバー起動失敗")
                 return result
 
-            # ログイン状態確認
-            if not self.check_login_status(driver):
-                result["errors"].append("ログイン状態確認失敗")
-                return result
+            # X.comにアクセス
+            driver.get("https://x.com/home")
+            time.sleep(5)
 
-            print("  ✓ ログイン確認完了")
+            # Cloudflare手動解除処理
+            try:
+                from cloudflare_handler import CloudflareHandler
+
+                if not CloudflareHandler.check_and_handle_cloudflare(driver):
+                    result["errors"].append("Cloudflare解除タイムアウト")
+                    return result
+            except ImportError:
+                # cloudflare_handler.pyがない場合はスキップ
+                pass
+
+            # ログイン状態確認と自動再ログイン
+            login_required = False
+
+            # ログインボタンの存在確認
+            try:
+                login_button = driver.find_element(
+                    By.XPATH, "//a[@href='/login']//span[text()='ログイン']"
+                )
+                if login_button:
+                    login_required = True
+            except:
+                pass
+
+            # アカウント作成ボタンの存在確認
+            if not login_required:
+                try:
+                    create_button = driver.find_element(
+                        By.XPATH, "//span[text()='アカウント作成']"
+                    )
+                    if create_button:
+                        login_required = True
+                except:
+                    pass
+
+            # ログインが必要な場合
+            if login_required:
+                print(f"  → セッションが切れています。再ログインします...")
+
+                # ログインページへ移動
+                driver.get("https://x.com/login")
+                time.sleep(3)
+
+                # Cloudflareチェック
+                try:
+                    from cloudflare_handler import CloudflareHandler
+
+                    if not CloudflareHandler.check_and_handle_cloudflare(driver):
+                        result["errors"].append("Cloudflare解除タイムアウト")
+                        return result
+                except ImportError:
+                    pass
+
+                try:
+                    # ユーザー名入力
+                    username_input = WebDriverWait(driver, 20).until(
+                        EC.presence_of_element_located(
+                            (By.CSS_SELECTOR, "input[autocomplete='username']")
+                        )
+                    )
+                    username_input.clear()
+                    username_input.send_keys(account["email"])
+                    time.sleep(2)
+
+                    # 次へボタン
+                    next_button = driver.find_element(
+                        By.XPATH, "//span[text()='次へ']/.."
+                    )
+                    driver.execute_script("arguments[0].click();", next_button)
+                    time.sleep(3)
+
+                    # パスワード入力
+                    password_input = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.CSS_SELECTOR, "input[type='password']")
+                        )
+                    )
+                    password_input.clear()
+                    password_input.send_keys(account["password"])
+                    time.sleep(2)
+
+                    # ログインボタン
+                    login_button = driver.find_element(
+                        By.XPATH, "//span[text()='ログイン']/.."
+                    )
+                    driver.execute_script("arguments[0].click();", login_button)
+                    time.sleep(5)
+
+                    # 二段階認証のチェック
+                    try:
+                        auth_input = WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located(
+                                (By.CSS_SELECTOR, "input[name='text']")
+                            )
+                        )
+                        print(f"  → 二段階認証を検出")
+
+                        secret_key = account.get("secret_key", "").strip()
+                        if secret_key:
+                            try:
+                                import pyotp
+
+                                totp = pyotp.TOTP(secret_key)
+                                auth_code = totp.now()
+
+                                print(f"  → 認証コード自動生成: {auth_code}")
+                                auth_input.clear()
+                                auth_input.send_keys(auth_code)
+                                time.sleep(2)
+
+                                next_button = driver.find_element(
+                                    By.XPATH, "//span[text()='次へ']/.."
+                                )
+                                driver.execute_script(
+                                    "arguments[0].click();", next_button
+                                )
+                                time.sleep(5)
+
+                                print(f"  ✓ 二段階認証完了")
+                            except:
+                                print(f"  ⚠ 手動で認証コードを入力してください")
+                                input("  認証完了後、Enterキーを押してください...")
+                        else:
+                            print(f"  ⚠ 手動で認証コードを入力してください")
+                            input("  認証完了後、Enterキーを押してください...")
+
+                    except TimeoutException:
+                        pass  # 二段階認証なし
+
+                    # ホームに戻る
+                    time.sleep(5)
+                    driver.get("https://x.com/home")
+                    time.sleep(5)
+
+                    # ログイン成功確認
+                    if "home" in driver.current_url.lower():
+                        print(f"  ✓ 再ログイン成功")
+                    else:
+                        print(f"  ✗ 再ログイン失敗")
+                        result["errors"].append("再ログイン失敗")
+                        return result
+
+                except Exception as e:
+                    print(f"  ✗ 再ログインエラー: {str(e)[:100]}")
+                    result["errors"].append(f"再ログインエラー: {str(e)[:100]}")
+                    return result
+            else:
+                print("  ✓ ログイン確認完了")
 
             # 各アクション実行
             if actions.get("like", False):
@@ -645,6 +839,54 @@ class AutomationExecutor:
 
         result_queue.put(result)
 
+    def execute_like(self, driver: webdriver.Chrome, url: str) -> bool:
+        """いいね実行（検証付き）"""
+        try:
+            if url not in driver.current_url:
+                driver.get(url)
+                if not self.wait_for_page_load(driver):
+                    return False
+
+            # 既にいいね済みチェック
+            try:
+                unlike_button = driver.find_element(
+                    By.CSS_SELECTOR, "[data-testid='unlike']"
+                )
+                print("    → 既にいいね済み")
+                return True
+            except:
+                pass
+
+            # いいねボタンクリック
+            like_button = driver.find_element(By.CSS_SELECTOR, "[data-testid='like']")
+            driver.execute_script(
+                "arguments[0].scrollIntoView({block: 'center'});", like_button
+            )
+            time.sleep(1)
+            driver.execute_script("arguments[0].click();", like_button)
+            time.sleep(3)
+
+            # ログインモーダルが出たか確認
+            if "login" in driver.current_url or "flow/login" in driver.current_url:
+                print("    ✗ 未ログイン（ログイン画面にリダイレクト）")
+                return False
+
+            # いいねが成功したか確認（unlike に変わったか）
+            try:
+                WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, "[data-testid='unlike']")
+                    )
+                )
+                return True
+            except:
+                print("    ✗ いいね失敗（状態変化なし）")
+                return False
+
+        except Exception as e:
+            print(f"    ✗ いいねエラー: {str(e)[:50]}")
+            return False
+
     def _execute_tasks(
         self,
         driver: webdriver.Chrome,
@@ -654,7 +896,7 @@ class AutomationExecutor:
         actions: Dict[str, bool],
         wait_range: Tuple[int, int],
     ) -> Dict:
-        """タスク実行部分（並列実行される）"""
+        """タスク実行部分（自動再ログイン機能付き）"""
         result = {
             "account_id": account_id,
             "email": account["email"],
@@ -666,12 +908,116 @@ class AutomationExecutor:
         }
 
         try:
-            # ログイン確認
-            if not self.check_login_status(driver):
-                result["errors"].append("ログイン状態確認失敗")
-                return result
+            # ホームページでログイン状態を確認
+            driver.get("https://x.com/home")
 
-            print(f"[{account_id}] ✓ ログイン確認完了")
+            # ページ遷移完了を待機（最大30秒）
+            WebDriverWait(driver, 30).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )
+            time.sleep(2)  # 追加の安定待機
+
+            # URLをチェック - ログインページにリダイレクトされたか
+            current_url = driver.current_url
+            if "login" in current_url or "flow/login" in current_url:
+                print(f"[{account_id}] → 未ログイン検出。ログインします...")
+
+                try:
+                    # ユーザー名入力
+                    username_input = WebDriverWait(driver, 20).until(
+                        EC.presence_of_element_located(
+                            (By.CSS_SELECTOR, "input[autocomplete='username']")
+                        )
+                    )
+                    username_input.clear()
+                    username_input.send_keys(account["email"])
+                    time.sleep(2)
+
+                    # 次へボタン
+                    next_button = driver.find_element(
+                        By.XPATH, "//span[text()='次へ']/.."
+                    )
+                    driver.execute_script("arguments[0].click();", next_button)
+                    time.sleep(3)
+
+                    # パスワード入力
+                    password_input = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located(
+                            (By.CSS_SELECTOR, "input[type='password']")
+                        )
+                    )
+                    password_input.clear()
+                    password_input.send_keys(account["password"])
+                    time.sleep(2)
+
+                    # ログインボタン
+                    login_button = driver.find_element(
+                        By.XPATH, "//span[text()='ログイン']/.."
+                    )
+                    driver.execute_script("arguments[0].click();", login_button)
+                    time.sleep(5)
+
+                    # 二段階認証のチェック
+                    try:
+                        auth_input = WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located(
+                                (By.CSS_SELECTOR, "input[name='text']")
+                            )
+                        )
+                        print(f"[{account_id}] → 二段階認証を検出")
+
+                        secret_key = account.get("secret_key", "").strip()
+                        if secret_key:
+                            try:
+                                import pyotp
+
+                                totp = pyotp.TOTP(secret_key)
+                                auth_code = totp.now()
+
+                                print(
+                                    f"[{account_id}] → 認証コード自動生成: {auth_code}"
+                                )
+                                auth_input.clear()
+                                auth_input.send_keys(auth_code)
+                                time.sleep(2)
+
+                                next_button = driver.find_element(
+                                    By.XPATH, "//span[text()='次へ']/.."
+                                )
+                                driver.execute_script(
+                                    "arguments[0].click();", next_button
+                                )
+                                time.sleep(5)
+
+                                print(f"[{account_id}] ✓ 二段階認証完了")
+                            except:
+                                print(
+                                    f"[{account_id}] ⚠ 手動で認証コードを入力してください"
+                                )
+                                input("  認証完了後、Enterキーを押してください...")
+                        else:
+                            print(
+                                f"[{account_id}] ⚠ 手動で認証コードを入力してください"
+                            )
+                            input("  認証完了後、Enterキーを押してください...")
+
+                    except TimeoutException:
+                        pass  # 二段階認証なし
+
+                    # ログイン完了を待機
+                    WebDriverWait(driver, 30).until(
+                        lambda d: "home" in d.current_url.lower()
+                        and "login" not in d.current_url.lower()
+                    )
+
+                    print(f"[{account_id}] ✓ ログイン成功")
+
+                except Exception as e:
+                    print(f"[{account_id}] ✗ ログインエラー: {str(e)[:100]}")
+                    result["errors"].append(f"ログインエラー: {str(e)[:100]}")
+                    return result
+            else:
+                print(f"[{account_id}] ✓ ログイン確認完了")
 
             # 各アクション実行
             if actions.get("like", False):
@@ -709,6 +1055,10 @@ class AutomationExecutor:
                 print(
                     f"[{account_id}] ✅ 完了: {', '.join(result['actions_performed'])}"
                 )
+
+        except Exception as e:
+            result["errors"].append(f"実行エラー: {str(e)[:100]}")
+            print(f"[{account_id}] ✗ エラー: {str(e)[:50]}")
 
         finally:
             self.profile_manager.close_driver(driver)

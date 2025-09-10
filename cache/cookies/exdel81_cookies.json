@@ -2,7 +2,7 @@
   "cookies": [
     {
       "domain": ".x.com",
-      "expiry": 1788719233,
+      "expiry": 1788878416,
       "httpOnly": false,
       "name": "twid",
       "path": "/",
@@ -21,115 +21,115 @@
     },
     {
       "domain": ".x.com",
-      "expiry": 1757192196,
+      "expiry": 1757351379,
       "httpOnly": false,
       "name": "gt",
       "path": "/",
       "sameSite": "Lax",
       "secure": true,
-      "value": "1964394824808968587"
+      "value": "1965062481212268803"
     },
     {
       "domain": ".x.com",
-      "expiry": 1791743218,
+      "expiry": 1791902401,
       "httpOnly": false,
       "name": "ct0",
       "path": "/",
       "sameSite": "Lax",
       "secure": true,
-      "value": "fc8cb37953c05d57febfc32abbef03e30a5877fd29cb299fda87017d443e1a5ed7029cec5811121daec0554f72e897359210fbd4e9acd95988a1e877f7cb28809bbb36fc5f3f48562f2ca8a952ab9b27"
+      "value": "6585e836839370342ff72c4b24df3fa676abc464046366b26daaa7f6582dfc41f7b1c3f02b6d3f73f7d50f94be133329cf9e896543b28eaf7a0e9f5692f2c7cff7411a7b27219a9d73cb3a0bd06b5d9f"
     },
     {
       "domain": ".x.com",
-      "expiry": 1791743233,
+      "expiry": 1791902415,
       "httpOnly": false,
       "name": "__cuid",
       "path": "/",
       "sameSite": "Lax",
       "secure": false,
-      "value": "fad46485f39148148d5b1c07241831fe"
+      "value": "a4a42e99b64c4039957a7f98993979ce"
     },
     {
       "domain": ".x.com",
-      "expiry": 1757269619,
+      "expiry": 1757428802,
       "httpOnly": true,
       "name": "att",
       "path": "/",
       "sameSite": "None",
       "secure": true,
-      "value": "1-AO4gONquWejvSctowcdBsKK3jWYTMEv1fxpxhVTW"
+      "value": "1-86pGbac8j7kkEMfqoSGh8Vw17DU1gkS8oCYbghfb"
     },
     {
       "domain": ".x.com",
-      "expiry": 1791743218,
+      "expiry": 1791902401,
       "httpOnly": true,
       "name": "auth_token",
       "path": "/",
       "sameSite": "None",
       "secure": true,
-      "value": "653e8a3eaebef3e88dec37d88c7005e802e9e66c"
+      "value": "3deb2bd706cf41cac5cea9e423e8bf918ca1ded8"
     },
     {
       "domain": ".x.com",
-      "expiry": 1791743218,
+      "expiry": 1791902401,
       "httpOnly": true,
       "name": "kdt",
       "path": "/",
       "sameSite": "Lax",
       "secure": true,
-      "value": "fIdCraTrhgcJJshEzHmDk30tzTawjHwLRvhauDwe"
+      "value": "rD7XBkH5Z7atQteSf5aXgMhHSstekQauabXXlAJD"
     },
     {
       "domain": ".x.com",
-      "expiry": 1791743232,
+      "expiry": 1791902415,
       "httpOnly": false,
       "name": "guest_id_ads",
       "path": "/",
       "sameSite": "None",
       "secure": true,
-      "value": "v1%3A175718319755773833"
+      "value": "v1%3A175734237924610814"
     },
     {
       "domain": ".x.com",
-      "expiry": 1791743232,
+      "expiry": 1791902415,
       "httpOnly": false,
       "name": "guest_id_marketing",
       "path": "/",
       "sameSite": "None",
       "secure": true,
-      "value": "v1%3A175718319755773833"
+      "value": "v1%3A175734237924610814"
     },
     {
       "domain": ".x.com",
-      "expiry": 1757184996,
+      "expiry": 1757344179,
       "httpOnly": true,
       "name": "__cf_bm",
       "path": "/",
       "sameSite": "None",
       "secure": true,
-      "value": "a3_dEVWdUycnnHh5vTrMzyMPborsc_UIoUUX_izwNtA-1757183197-1.0.1.1-ShXOqCxCE9WkcpLL1jdgttVOiMHurctIvjXnyqPrfrSU06Xih..5GjHuNVWTpl_VqWi.qDJGM3DXBTtWof7KwIDOE6bSSFZX9XqJaxqxPBI"
+      "value": "PJ_I2PnR71RrTrHTXL_QsXRTlbbdKPZ3FoBzVWj8GBw-1757342379-1.0.1.1-qvN9lzpraCcF4_prubFOCOAtpmN8VEaxQjSanUjMxYi9Ob_c6O4xUcC4FBAGSm5G_Bj3V9NLrLuMy4oIqh9CkON3wRgmCmBv7WsxFols..k"
     },
     {
       "domain": ".x.com",
-      "expiry": 1791743196,
+      "expiry": 1791902379,
       "httpOnly": false,
       "name": "guest_id",
       "path": "/",
       "sameSite": "None",
       "secure": true,
-      "value": "v1%3A175718319755773833"
+      "value": "v1%3A175734237924610814"
     },
     {
       "domain": ".x.com",
-      "expiry": 1791743196,
+      "expiry": 1791902379,
       "httpOnly": false,
       "name": "personalization_id",
       "path": "/",
       "sameSite": "None",
       "secure": true,
-      "value": "\"v1_5Krzhq0S8o44stwTSh9mbw==\""
+      "value": "\"v1_gqyo0hVfl08wzKyIIvX9Jg==\""
     }
   ],
-  "saved_at": "2025-09-07T03:27:16.094571",
+  "saved_at": "2025-09-08T23:40:18.973748",
   "email": "exdel81"
 }
